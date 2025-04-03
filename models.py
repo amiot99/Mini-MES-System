@@ -17,13 +17,19 @@ class ProductionOrder:
         self.updated_at = datetime.datetime.now()
 
     def display_info(self, origin_width):
+        status_str = (
+            f"{Fore.CYAN}{self.status:<13}{Style.RESET_ALL}"
+                if self.status == "Assembly"
+                else self.status
+        )
+
         print(f"{Fore.RED}{'Order ID:' :<9}{Style.RESET_ALL}{self.order_id:<5}"
               f"{Fore.RED}{'Model:' :<6}{Style.RESET_ALL} {self.model:<12}"
               f"{Fore.RED}{'Maker:':<6}{Style.RESET_ALL} {self.maker:<4}"
               f"{Fore.RED}{'Product_ID:':<11}{Style.RESET_ALL} {self.product_id:<13}"
               f"{Fore.RED}{'Quantity:':<10}{Style.RESET_ALL}{self.quantity:<5}"
               f"{Fore.RED}{'Due Date:':<9}{Style.RESET_ALL} {self.due_date:<11}"
-              f"{Fore.RED}{'Status:':<8}{Style.RESET_ALL}{self.status:<13} "
+              f"{Fore.RED}{'Status:':<8}{Style.RESET_ALL}{status_str:<13} "
               f"{Fore.RED}{'Origin:':<7}{Style.RESET_ALL} {self.origin:<{origin_width}} "
               f"{Fore.RED}{'Created at:':<12}{Style.RESET_ALL}{str(self.created_at):<27}"
               f"{Fore.RED}{'Updated at:':<12}{Style.RESET_ALL}{str(self.updated_at):<27}")
