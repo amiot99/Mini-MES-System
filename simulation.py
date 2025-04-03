@@ -23,7 +23,7 @@ class Simulator:
             for i in range(1,11):
                 order = (ProductionOrder(order_id, "Radeon 9070","AMD", "AMD-9070-000", 100, "2025-05-01","Created",random.choice(countries)))
                 orders.append(order)
-                '''time.sleep(0.01)'''
+                #time.sleep(0.01)
                 order_id += 1
         return orders
 
@@ -42,14 +42,14 @@ class Simulator:
 
                 for o in batches[order.model]['orders']:
                     o.display_info(max_origin_length)
-                '''time.sleep(.5)'''
+                    #time.sleep(0.5)
 
                 for batch in batches[order.model]['orders']:
                     batch.update_status("Assembly")
                 print(f"{Fore.CYAN}The batch has reached the required quantity. Moving to next phase, Assembly{Style.RESET_ALL}")
                 for o in batches[order.model]['orders']:
                     o.display_info(max_origin_length)
-                '''time.sleep(.5)'''
+                    #time.sleep(0.5)
                 self.completed_batches.append(batches[order.model])
 
                 batches[order.model] = {'orders': [], 'total_quantity': 0}
@@ -66,12 +66,14 @@ class Simulator:
             batches_to_move.append(i['orders'])
             if accumulator >= 5000:
                 print(
-                    f"{Fore.CYAN}Batches have reached target. Moving to next phase, Quality check{Style.RESET_ALL}")
+                    f"{Fore.CYAN}Batches have reached target. Moving to next phase in 5 seconds, Quality check{Style.RESET_ALL}")
+                time.sleep(5)
                 for orders_list in batches_to_move:
                     for order in orders_list:
                         if order.status == "Assembly":
                             order.update_status ("Quality Check")
                         order.display_info(max_origin_length)
+                        #time.sleep(.5)
 
 
 
