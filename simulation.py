@@ -48,6 +48,6 @@ class Simulator:
 simulator = Simulator()
 orders = simulator.batch()
 max_origin_length = max(len(order.origin) for order in orders)
-
 time.sleep(0)
 simulator.batch_processing(orders)
+
