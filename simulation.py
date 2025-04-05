@@ -1,6 +1,7 @@
 import time
 import random
 from functools import total_ordering
+from itertools import accumulate
 
 import pycountry
 from colorama import Fore, Style
@@ -62,13 +63,14 @@ class Simulator:
         accumulator = 0
         batches_to_move = []
         self.quality_checked_batches = []
+
         for i in self.completed_batches:
             accumulator += i['total_quantity']
             batches_to_move.append(i['orders'])
             if accumulator >= 5000:
                 print(
-                    f"{Fore.CYAN}Batches have reached target. Moving to next phase in 5 seconds, Quality check{Style.RESET_ALL}")
-                time.sleep(5)
+                    f"{Fore.CYAN}Batches have reached target. Moving to next phase in 3 seconds, Quality check{Style.RESET_ALL}")
+                time.sleep(3)
                 for orders_list in batches_to_move:
                     for order in orders_list:
                         if order.status == "Assembly":
@@ -76,10 +78,33 @@ class Simulator:
                         order.display_info(max_origin_length)
                     self.quality_checked_batches.append({'orders':orders_list})
                         #time.sleep(.5)
-                break
-
+                    batches_to_move = []
+                    accumulator = 0
+        return self.quality_checked_batches
 
     def packaging(self):
+        print(f"{Fore.GREEN}Starting Packaging Phase…{Style.RESET_ALL}")
+        packaging_accumulator = 0
+        orders_to_package = []
+
+        for qc_batches in self.quality_checked_batches:
+            for order in qc_batches['orders']:
+                if order.status == "Quality Check":
+                    packaging_accumulator += order.quantity
+                    orders_to_package.append(order)
+                    if packaging_accumulator >= 5000:
+                        break
+            if packaging_accumulator >= 5000:
+                break
+
+        for order in orders_to_package:
+            order.update_status("Packaged")
+            order.display_info(max_origin_length)
+            #time.sleep(.5)
+
+        print(f"{Fore.GREEN}All quality‑checked orders are now in Packaging.{Style.RESET_ALL}")
+
+
 
 
 
@@ -88,4 +113,5 @@ orders = simulator.batch()
 max_origin_length = max(len(order.origin) for order in orders)
 simulator.assembly_batch(orders)
 simulator.quality_check()
+simulator.packaging()
 

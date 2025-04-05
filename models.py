@@ -21,6 +21,8 @@ class ProductionOrder:
             status_str = f"{Fore.CYAN}{self.status:<13}{Style.RESET_ALL}"
         elif self.status == "Quality Check":
             status_str = f"{Fore.YELLOW}{self.status:<13}{Style.RESET_ALL}"
+        elif self.status == "Packaged":
+            status_str = f"{Fore.GREEN}{self.status:<13}{Style.RESET_ALL}"
         else:
             status_str = self.status
 
