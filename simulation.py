@@ -61,6 +61,7 @@ class Simulator:
     def quality_check(self):
         accumulator = 0
         batches_to_move = []
+        self.quality_checked_batches = []
         for i in self.completed_batches:
             accumulator += i['total_quantity']
             batches_to_move.append(i['orders'])
@@ -73,8 +74,12 @@ class Simulator:
                         if order.status == "Assembly":
                             order.update_status ("Quality Check")
                         order.display_info(max_origin_length)
+                    self.quality_checked_batches.append({'orders':orders_list})
                         #time.sleep(.5)
+                break
 
+
+    def packaging(self):
 
 
 
