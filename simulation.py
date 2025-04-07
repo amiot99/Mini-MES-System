@@ -86,7 +86,7 @@ class Simulator:
         print(f"{Fore.GREEN}Starting Packaging Phase…{Style.RESET_ALL}")
         packaging_accumulator = 0
         orders_to_package = []
-
+        self.packaged_batches = []
         for qc_batches in self.quality_checked_batches:
             for order in qc_batches['orders']:
                 if order.status == "Quality Check":
@@ -101,8 +101,25 @@ class Simulator:
             order.update_status("Packaged")
             order.display_info(max_origin_length)
             #time.sleep(.5)
+            self.packaged_batches.append(order)
 
         print(f"{Fore.GREEN}All quality‑checked orders are now in Packaging.{Style.RESET_ALL}")
+
+    def shipped(self):
+        target_model = "Radeon 9070"
+        accumulator = 0
+        to_ship = []
+        models = set(o.model for o in self.packaged_batches)
+        for order in self.packaged_batches:
+            if order.model == target_model:
+                accumulator += order.quantity
+                to_ship.append(order)
+            if accumulator >= 5000:
+                break
+        for order in to_ship:
+            order.update_status("Shipped")
+            order.display_info(max_origin_length)
+        print(f"{Fore.MAGENTA}Shipped batch for {target_model}.{Style.RESET_ALL}")
 
 
 
@@ -114,4 +131,5 @@ max_origin_length = max(len(order.origin) for order in orders)
 simulator.assembly_batch(orders)
 simulator.quality_check()
 simulator.packaging()
+simulator.shipped()
 
