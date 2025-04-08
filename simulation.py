@@ -1,8 +1,8 @@
 import time
 import random
+from helper import log_order_event
 from functools import total_ordering
 from itertools import accumulate
-
 import pycountry
 from colorama import Fore, Style
 from models import ProductionOrder
@@ -28,7 +28,7 @@ class Simulator:
                 order_id += 1
         return orders
 
-    def assembly_batch(self,orders):
+    def assembly_batch(self,orders,max_origin_length):
         batches = {}
         for order in orders:
             if order.model not in batches:
@@ -50,6 +50,7 @@ class Simulator:
                 print(f"{Fore.CYAN}The batch has reached the required quantity. Moving to next phase, Assembly{Style.RESET_ALL}")
                 for o in batches[order.model]['orders']:
                     o.display_info(max_origin_length)
+                    log_order_event(o, "Assembly")
                     #time.sleep(0.5)
                 self.completed_batches.append(batches[order.model])
 
@@ -76,8 +77,9 @@ class Simulator:
                         if order.status == "Assembly":
                             order.update_status ("Quality Check")
                         order.display_info(max_origin_length)
+                        log_order_event(order, "Quality Check")
                     self.quality_checked_batches.append({'orders':orders_list})
-                        #time.sleep(.5)
+                    #time.sleep(.5)
                     batches_to_move = []
                     accumulator = 0
         return self.quality_checked_batches
@@ -100,6 +102,7 @@ class Simulator:
         for order in orders_to_package:
             order.update_status("Packaged")
             order.display_info(max_origin_length)
+            log_order_event(order, "Packaged")
             #time.sleep(.5)
             self.packaged_batches.append(order)
 
@@ -109,7 +112,8 @@ class Simulator:
         target_model = "Radeon 9070"
         accumulator = 0
         to_ship = []
-        models = set(o.model for o in self.packaged_batches)
+        self.shipped_batches = []
+        #models = set(o.model for o in self.packaged_batches)
         for order in self.packaged_batches:
             if order.model == target_model:
                 accumulator += order.quantity
@@ -119,7 +123,12 @@ class Simulator:
         for order in to_ship:
             order.update_status("Shipped")
             order.display_info(max_origin_length)
+            self.shipped_batches.append(order)
+            log_order_event(order,"Shipped")
         print(f"{Fore.MAGENTA}Shipped batch for {target_model}.{Style.RESET_ALL}")
+
+
+
 
 
 
@@ -128,7 +137,7 @@ class Simulator:
 simulator = Simulator()
 orders = simulator.batch()
 max_origin_length = max(len(order.origin) for order in orders)
-simulator.assembly_batch(orders)
+simulator.assembly_batch(orders,max_origin_length)
 simulator.quality_check()
 simulator.packaging()
 simulator.shipped()
