@@ -6,7 +6,9 @@ from itertools import accumulate
 import pycountry
 from colorama import Fore, Style
 from models import ProductionOrder
+import uuid
 
+RUN_ID = str(uuid.uuid4())
 countries = [c.name for c in pycountry.countries]
 """models = ["Radeon 9070","Radeon 9070xt", "Radeon 7900 xtx"]"""
 
@@ -24,6 +26,7 @@ class Simulator:
             for i in range(1,11):
                 order = (ProductionOrder(order_id, "Radeon 9070","AMD", "AMD-9070-000", 100, "2025-05-01","Created",random.choice(countries)))
                 orders.append(order)
+                log_order_event(order, "Created", RUN_ID)
                 #time.sleep(0.01)
                 order_id += 1
         return orders
@@ -50,7 +53,7 @@ class Simulator:
                 print(f"{Fore.CYAN}The batch has reached the required quantity. Moving to next phase, Assembly{Style.RESET_ALL}")
                 for o in batches[order.model]['orders']:
                     o.display_info(max_origin_length)
-                    log_order_event(o, "Assembly")
+                    log_order_event(o, "Assembly", RUN_ID)
                     #time.sleep(0.5)
                 self.completed_batches.append(batches[order.model])
 
@@ -77,7 +80,7 @@ class Simulator:
                         if order.status == "Assembly":
                             order.update_status ("Quality Check")
                         order.display_info(max_origin_length)
-                        log_order_event(order, "Quality Check")
+                        log_order_event(order, "Quality Check", RUN_ID)
                     self.quality_checked_batches.append({'orders':orders_list})
                     #time.sleep(.5)
                     batches_to_move = []
@@ -102,7 +105,7 @@ class Simulator:
         for order in orders_to_package:
             order.update_status("Packaged")
             order.display_info(max_origin_length)
-            log_order_event(order, "Packaged")
+            log_order_event(order, "Packaged",RUN_ID)
             #time.sleep(.5)
             self.packaged_batches.append(order)
 
@@ -124,7 +127,7 @@ class Simulator:
             order.update_status("Shipped")
             order.display_info(max_origin_length)
             self.shipped_batches.append(order)
-            log_order_event(order,"Shipped")
+            log_order_event(order,"Shipped", RUN_ID)
         print(f"{Fore.MAGENTA}Shipped batch for {target_model}.{Style.RESET_ALL}")
 
 

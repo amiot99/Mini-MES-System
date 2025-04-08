@@ -1,13 +1,14 @@
 import sqlite3
 import datetime
 
-def log_order_event(order, new_status):
+def log_order_event(order, new_status, RUN_ID):
     connection = sqlite3.connect("order_log.db")
     cursor = connection.cursor()
 
     create_table_query = """
     CREATE TABLE IF NOT EXISTS order_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        run_id TEXT,
         order_id INTEGER,
         model TEXT,
         maker TEXT,
@@ -30,12 +31,13 @@ def log_order_event(order, new_status):
 
     insert_query = """
       INSERT INTO order_logs (
-          order_id, model, maker, product_id, quantity, due_date,
+          RUN_ID, order_id, model, maker, product_id, quantity, due_date,
           status, origin, created_at, updated_at, log_timestamp
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       """
 
     data_tuple = (
+        RUN_ID,
         order.order_id,
         order.model,
         order.maker,
