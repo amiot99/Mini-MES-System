@@ -1,6 +1,6 @@
 import time
 import random
-from helper import log_order_event
+from db_creation import log_order_event
 from functools import total_ordering
 from itertools import accumulate
 import pycountry
